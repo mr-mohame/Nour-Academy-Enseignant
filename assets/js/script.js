@@ -1,8 +1,5 @@
 import { groupes, eleves } from './data.js';
 const liste_eleves = document.querySelector("#liste-eleves");
-console.log("Script chargé");
-console.log(eleves);
-console.log(liste_eleves);
 // console.log(liste_eleves);
 
 function creerLigne(eleve) {
@@ -15,7 +12,7 @@ function creerLigne(eleve) {
     li.append(div);   // li > div
 
     const button = document.createElement("button");
-    button.type= "button";
+    button.type = "button";
     button.classList.add("btn-fiche", "flex", "min-h-11", "flex-1", "items-center", "gap-3", "text-left")
     div.append(button);  // div > btn
 
@@ -50,7 +47,7 @@ function creerLigne(eleve) {
     if (resultat === null) {
         span_moyenne.textContent = "-";
     } else {
-        span_moyenne.textContent = resultat.toFixed(2) + " / 20";
+        span_moyenne.textContent = resultat + " / 20";
     }
     button.append(span_moyenne)
 
@@ -61,7 +58,7 @@ function creerLigne(eleve) {
     div.append(div_actions);   // div > div
 
     const btn_action = document.createElement("button");
-    btn_action.type= "button"
+    btn_action.type = "button"
     btn_action.classList.add("btn-absent", "h-11", "rounded-full", "border", "border-line", "bg-paper", "px-4", "text-sm", "lg:w-24")
     btn_action.textContent = "Absent"
     div_actions.append(btn_action);
@@ -84,24 +81,31 @@ function creerLigne(eleve) {
     input_note.classList.add("h-11", "w-full", "rounded-full", "border", "border-line", "bg-paper", "px-4", "text-sm", "lg:w-24")
     label.append(input_note)
 
-    const btn_ajouter= document.createElement("button");
+    const btn_ajouter = document.createElement("button");
     btn_ajouter.type = "button";
     btn_ajouter.classList.add("btn-note", "h-11", "rounded-full", "bg-ink", "px-3", "sm:px-4", "text-sm", "font-medium", "text-white", "hover:bg-brand");
-    btn_ajouter.textContent="Ajouter la note"
+    btn_ajouter.textContent = "Ajouter la note"
     div_actions.append(btn_ajouter)
 
     const paragraph = document.createElement("p");
     paragraph.classList.add("message", "mt-2", "text-xs", "text-alert")
-    paragraph.textContent= "La note doit etre un nomber enter 0 et 20";
+    paragraph.textContent = "La note doit etre un nomber enter 0 et 20";
     paragraph.hidden = true;
-   
+    li.append(paragraph);
+
     return li;
 
 }
-eleves.map(function (eleve) {
-    const ligne = creerLigne(eleve)
-    liste_eleves.append(ligne);
-})
+const compteur = document.querySelector("#compteur");
+function renderData(filterData = eleves) {
+    liste_eleves.replaceChildren();  // vider tout le contenu
+    compteur.textContent= filterData.length + " eleve"
+    filterData.map(function (eleve) {
+        const ligne = creerLigne(eleve)
+        liste_eleves.append(ligne);
+    })
+
+}
 
 function calculMoyenne(notes) {
     if (notes.length === 0) {
@@ -110,5 +114,43 @@ function calculMoyenne(notes) {
     const somme = notes.reduce((total, note) => {
         return total + note;
     }, 0);
-    return somme / notes.length;
+    const moyenne = somme / notes.length;
+    return moyenne.toFixed(2).replace('.', ',');
 }
+
+//generer la liste des groupes
+const filtre_groupe = document.querySelector("#filtre-groupe");
+// console.log(filtre_groupe);
+groupes.forEach(function (group) {
+    const option = document.createElement("option")
+    option.value = group.id
+    option.textContent = group.nom;
+    filtre_groupe.append(option)
+
+});
+filtre_groupe.addEventListener("change", function () {
+    const groupeSelectionne = filtre_groupe.value;
+
+    const filter_data = eleves.filter(function (eleve) {
+        return eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "";
+    })
+    // console.log(filter_data);
+    renderData(filter_data)
+});
+renderData()
+
+//filtrage par nom
+const rechercheNom = document.querySelector("#recherche");
+// console.log(rechercheNom)
+
+rechercheNom.addEventListener("input", function(){
+    const valeurRechetcher = rechercheNom.value.trim();
+    const resultat = eleves.filter(function(eleve){
+        return eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) || eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase());
+
+    });
+    renderData(resultat);
+});
+
+
+

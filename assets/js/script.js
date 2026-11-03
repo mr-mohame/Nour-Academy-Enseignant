@@ -96,6 +96,7 @@ function creerLigne(eleve) {
     return li;
 
 }
+const compteur = document.querySelector("#compteur");
 function renderData(filterData = eleves) {
     liste_eleves.replaceChildren();  // vider tout le contenu
     compteur.textContent= filterData.length + " eleve"
@@ -105,7 +106,6 @@ function renderData(filterData = eleves) {
     })
 
 }
-
 
 function calculMoyenne(notes) {
     if (notes.length === 0) {
@@ -120,8 +120,6 @@ function calculMoyenne(notes) {
 
 //generer la liste des groupes
 const filtre_groupe = document.querySelector("#filtre-groupe");
-const compteur = document.querySelector("#compteur");
-
 // console.log(filtre_groupe);
 groupes.forEach(function (group) {
     const option = document.createElement("option")
@@ -130,21 +128,29 @@ groupes.forEach(function (group) {
     filtre_groupe.append(option)
 
 });
-
 filtre_groupe.addEventListener("change", function () {
     const groupeSelectionne = filtre_groupe.value;
 
     const filter_data = eleves.filter(function (eleve) {
         return eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "";
     })
-
     // console.log(filter_data);
     renderData(filter_data)
-
-
-
 });
 renderData()
+
+//filtrage par nom
+const rechercheNom = document.querySelector("#recherche");
+// console.log(rechercheNom)
+
+rechercheNom.addEventListener("input", function(){
+    const valeurRechetcher = rechercheNom.value.trim();
+    const resultat = eleves.filter(function(eleve){
+        return eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) || eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase());
+
+    });
+    renderData(resultat);
+});
 
 
 

@@ -5,7 +5,7 @@ const liste_eleves = document.querySelector("#liste-eleves");
 function creerLigne(eleve) {
     const li = document.createElement("li");
     li.classList.add("rounded-2xl", "border", "border-line", "bg-card", "p-3")
-    if (eleve.absences > 3) {
+    if (eleve.absences >= 3) {
         li.classList.add("alerte");
     }
 
@@ -40,7 +40,10 @@ function creerLigne(eleve) {
     // nomber dabsence
     const spanAbsence = document.createElement("span");
     spanAbsence.classList.add("absence-count", "block", "text-sm", "text-muted")
-    spanAbsence.textContent = eleve.absences + " absence(s)";
+    const nombre_absences = document.createElement("span");
+    nombre_absences.classList.add("nombre-absences");
+    nombre_absences.textContent = eleve.absences + " absence(s)";
+    spanAbsence.append(nombre_absences);
     if (eleve.absences >= 3) {
         li.classList.add("alerte");
 
@@ -57,8 +60,9 @@ function creerLigne(eleve) {
 
     // calcule moyenne
     const span_moyenne = document.createElement("span");
-    span_moyenne.classList.add("font-serif", "text-xl")
+    span_moyenne.classList.add("moyenne", "font-serif", "text-xl");
     const resultat = calculMoyenne(eleve.notes);
+
     if (resultat === null) {
         span_moyenne.textContent = "-";
     } else {
@@ -183,7 +187,8 @@ liste_eleves.addEventListener("click", function (event) {
     if (!resultat) return;
     resultat.absences++;
     // console.log(resultat.absences);
-    absence_count.textContent = resultat.absences + " absence(s)";
+    const nombre_absences = absence_count.querySelector(".nombre-absences");
+    nombre_absences.textContent = resultat.absences + " absence(s)";
     if (resultat.absences >= 3) {
         ligne.classList.add("alerte");
 
@@ -198,9 +203,49 @@ liste_eleves.addEventListener("click", function (event) {
         }
     }
 });
+// gerer les notes 
 
+liste_eleves.addEventListener("click", function (event) {
+    const btn_ajouter = event.target.closest(".btn-ajouter");
 
+    if (!btn_ajouter) return;
 
+    const ligne = btn_ajouter.closest("li");
+    const id = ligne.dataset.id;
+
+    const input_note = ligne.querySelector("input");
+    const message = ligne.querySelector(".message");
+
+    const note = Number(input_note.value);
+
+    // pour valide la note doit enter 0 et 20 
+    if (input_note.value === "" || note < 0 || note > 20) {
+        message.hidden = false;
+        return;
+    }
+
+    message.hidden = true;
+
+    // pour chercher eleve
+    const resultat_note = eleves.find(function (eleve) {
+        return eleve.id === Number(id);
+    });
+
+    if (!resultat_note) return;
+
+    // pour ajouter la note
+    resultat_note.notes.push(note);
+
+    // pour calcule la moyenne on a appel la function calculmoyeen
+    const moyenne = calculMoyenne(resultat_note.notes);
+
+    // apres dajouter un noter doit modifier et afficher le nouveau moyenne
+    const moyenne_element = ligne.querySelector(".moyenne");
+    moyenne_element.textContent = moyenne + " / 20";
+
+    // 
+    input_note.value = "";
+});
 
 
 

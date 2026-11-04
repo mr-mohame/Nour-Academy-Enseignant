@@ -128,29 +128,31 @@ groupes.forEach(function (group) {
     filtre_groupe.append(option)
 
 });
-filtre_groupe.addEventListener("change", function () {
-    const groupeSelectionne = filtre_groupe.value;
-
-    const filter_data = eleves.filter(function (eleve) {
-        return eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "";
-    })
-    // console.log(filter_data);
-    renderData(filter_data)
-});
+// filtrage group
+filtre_groupe.addEventListener("change", filterGoupInput)
 renderData()
-
 //filtrage par nom
 const rechercheNom = document.querySelector("#recherche");
 // console.log(rechercheNom)
 
-rechercheNom.addEventListener("input", function(){
+rechercheNom.addEventListener("input", filterGoupInput)
+// function pour filter le nom input et group option 
+function filterGoupInput(){
+    const groupeSelectionne = filtre_groupe.value;
     const valeurRechetcher = rechercheNom.value.trim();
-    const resultat = eleves.filter(function(eleve){
-        return eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) || eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase());
 
-    });
-    renderData(resultat);
-});
+    const filter_data = eleves.filter(function (eleve) {
+        return (eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "") && 
+        (eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) ||
+         eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()))
+    })
+    renderData(filter_data);
+}
+
+// gerer les absences 
+
+
+
 
 
 

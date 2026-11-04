@@ -5,6 +5,10 @@ const liste_eleves = document.querySelector("#liste-eleves");
 function creerLigne(eleve) {
     const li = document.createElement("li");
     li.classList.add("rounded-2xl", "border", "border-line", "bg-card", "p-3")
+    if (eleve.absences > 3) {
+        li.classList.add("alerte");
+    }
+
     li.dataset.id = eleve.id
 
     const div = document.createElement("div");
@@ -35,8 +39,19 @@ function creerLigne(eleve) {
     // infos.append(spanName);
     // nomber dabsence
     const spanAbsence = document.createElement("span");
-    spanAbsence.classList.add("block", "text-sm", "text-muted")
+    spanAbsence.classList.add("absence-count", "block", "text-sm", "text-muted")
     spanAbsence.textContent = eleve.absences + " absence(s)";
+    if (eleve.absences >= 3) {
+        li.classList.add("alerte");
+
+        const badge = document.createElement("span");
+        badge.classList.add("badge", "ml-1", "whitespace-nowrap",
+            "rounded-full", "bg-alert", "px-2",
+            "py-0.5", "text-xs", "font-medium", "text-white");
+
+        badge.textContent = "Prévenir les parents";
+        spanAbsence.append(badge);
+    }
     infos.append(spanName, spanAbsence);
     button.append(infos)
 
@@ -78,12 +93,12 @@ function creerLigne(eleve) {
     input_note.max = "20";
     input_note.step = "0.5";
     input_note.placeholder = "Note";
-    input_note.classList.add("h-11", "w-full", "rounded-full", "border", "border-line", "bg-paper", "px-4", "text-sm", "lg:w-24")
+    input_note.classList.add("btn_note", "h-11", "w-full", "rounded-full", "border", "border-line", "bg-paper", "px-4", "text-sm", "lg:w-24")
     label.append(input_note)
 
     const btn_ajouter = document.createElement("button");
     btn_ajouter.type = "button";
-    btn_ajouter.classList.add("btn-note", "h-11", "rounded-full", "bg-ink", "px-3", "sm:px-4", "text-sm", "font-medium", "text-white", "hover:bg-brand");
+    btn_ajouter.classList.add("btn-ajouter", "h-11", "rounded-full", "bg-ink", "px-3", "sm:px-4", "text-sm", "font-medium", "text-white", "hover:bg-brand");
     btn_ajouter.textContent = "Ajouter la note"
     div_actions.append(btn_ajouter)
 
@@ -99,7 +114,7 @@ function creerLigne(eleve) {
 const compteur = document.querySelector("#compteur");
 function renderData(filterData = eleves) {
     liste_eleves.replaceChildren();  // vider tout le contenu
-    compteur.textContent= filterData.length + " eleve"
+    compteur.textContent = filterData.length + " eleve"
     filterData.map(function (eleve) {
         const ligne = creerLigne(eleve)
         liste_eleves.append(ligne);
@@ -137,19 +152,55 @@ const rechercheNom = document.querySelector("#recherche");
 
 rechercheNom.addEventListener("input", filterGoupInput)
 // function pour filter le nom input et group option 
-function filterGoupInput(){
+function filterGoupInput() {
     const groupeSelectionne = filtre_groupe.value;
     const valeurRechetcher = rechercheNom.value.trim();
 
     const filter_data = eleves.filter(function (eleve) {
-        return (eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "") && 
-        (eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) ||
-         eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()))
+        return (eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "") &&
+            (eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) ||
+                eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()))
     })
     renderData(filter_data);
 }
 
 // gerer les absences 
+
+
+liste_eleves.addEventListener("click", function (event) {
+    const button = event.target.closest(".btn-absent");
+    if (button === null) return;
+
+    const ligne = button.closest("li");
+
+    const id = ligne.dataset.id
+
+    const absence_count = ligne.querySelector(".absence-count");
+    // console.log(absence_count);
+    const resultat = eleves.find(function (eleve) {
+        return eleve.id === Number(id)
+    })
+    if (!resultat) return;
+    resultat.absences++;
+    // console.log(resultat.absences);
+    absence_count.textContent = resultat.absences + " absence(s)";
+    if (resultat.absences >= 3) {
+        ligne.classList.add("alerte");
+
+        if (!absence_count.querySelector(".badge")) {
+            const badge = document.createElement("span");
+            badge.classList.add("badge", "ml-1", "whitespace-nowrap",
+                "rounded-full", "bg-alert", "px-2",
+                "py-0.5", "text-xs", "font-medium", "text-white");
+
+            badge.textContent = "Prévenir les parents";
+            absence_count.append(badge);
+        }
+    }
+});
+
+
+
 
 
 

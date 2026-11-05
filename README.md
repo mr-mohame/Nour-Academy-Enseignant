@@ -31,7 +31,6 @@ Nour Academy – Espace Enseignant est une application développée pour facilit
 ```text
 Nour-Academy-Enseignant/
 │
-├── .vscode/
 │
 ├── assets/
 │   └── js/

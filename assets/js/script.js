@@ -248,7 +248,153 @@ liste_eleves.addEventListener("click", function (event) {
 });
 
 
+//ajouter un eleve avec validation de nom tele email ....
+const forma_eleve = document.querySelector("#form-eleve");
+const prenom_eleve = document.querySelector("#prenom");
+const nom_eleve = document.querySelector("#nom");
+const groupe_eleve = document.querySelector("#groupe");
+const email_eleve = document.querySelector("#email");
+const telephone_eleve = document.querySelector("#telephone");
+const code_eleve = document.querySelector("#code");
+
+//regex name et prenom
+const regexName = /^[a-zA-ZÀ-ÿ\s-]{2,}$/;
+//regex email
+const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//regex tele
+const regexTelephone = /^(06|07)[0-9]{8}$/;
+//regex code privisoir
+const regexCode = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/;
 
 
+
+// validation pour prenom
+const prenom_champ = prenom_eleve.closest(".champ");
+prenom_eleve.addEventListener("input", function () {
+
+     const prenom = prenom_eleve.value.trim();
+
+    if (prenom === "") {
+        prenom_champ.className = "champ";
+        prenom_msg.textContent = "2 caractères minimum.";
+    }
+    else if (!regexName.test(prenom)) {
+        prenom_champ.className = "champ erreur";
+        prenom_msg.textContent = "Prénom invalide.";
+    }
+    else {
+        prenom_champ.className = "champ valide";
+        prenom_msg.textContent = "Prénom valide.";
+    }
+
+
+});
+// validation nom
+const nom_champ = nom_eleve.closest(".champ");
+nom_eleve.addEventListener("input", function () {
+
+     const nom = nom_eleve.value.trim();
+
+    if (nom === "") {
+        nom_champ.className = "champ";
+        nom_msg.textContent = "2 caractères minimum : lettres, espaces ou tirets.";
+    }
+    else if (!regexName.test(nom)) {
+        nom_champ.className = "champ erreur";
+        nom_msg.textContent = "nom invalide.";
+    }
+    else {
+        nom_champ.className = "champ valide";
+        nom_msg.textContent = "nom valide.";
+    }
+});
+
+// pour remplaire les group 
+groupes.forEach(function (group) {
+    const option = document.createElement("option");
+    option.value = group.id;
+    option.textContent = group.nom;
+
+    groupe_eleve.append(option);
+});
+
+// pour valide les group 
+const groupe_msg = document.querySelector("#groupe-msg");
+const groupe_champ = groupe_eleve.closest(".champ");
+
+groupe_eleve.addEventListener("change", function () {
+
+    if (groupe_eleve.value === "") {
+        groupe_champ.className = "champ erreur";
+        groupe_msg.textContent = "Veuillez choisir un groupe.";
+    } else {
+        groupe_champ.className = "champ valide";
+        groupe_msg.textContent = "Groupe valide.";
+    }
+
+});
+
+// pour valide lemail
+const email_msg = document.querySelector("#email-msg");
+const email_champ = email_eleve.closest(".champ");
+email_eleve.addEventListener("input", function () {
+
+    const email = email_eleve.value.trim();
+
+    if (email === "") {
+        email_champ.className = "champ";
+        email_msg.textContent = "Exemple : parent@mail.ma";
+    }
+    else if (!regexEmail.test(email)) {
+        email_champ.className = "champ erreur";
+        email_msg.textContent = "Adresse email invalide.";
+    }
+    else {
+        email_champ.className = "champ valide";
+        email_msg.textContent = "Email valide.";
+    }
+
+});
+// pour valive le number tele 
+const tele_msg = document.querySelector("#telephone-msg");
+const tele_champ = telephone_eleve.closest(".champ");
+telephone_eleve.addEventListener("input", function () {
+
+    const tele = telephone_eleve.value.trim();
+
+    if (tele === "") {
+        tele_champ.className = "champ";
+        tele_msg.textContent = "10 chiffres : commence par 06 ou 07";
+    }
+    else if (regexTelephone.test(tele)=== false) {
+        tele_champ.className = "champ erreur";
+        tele_msg.textContent = "Numero invalide : exemple 0612345678";
+    }
+    else {
+        tele_champ.className = "champ valide";
+        tele_msg.textContent = "Numero valide.";
+    }
+
+});
+
+// pour valive le code provisoir 
+const code_msg = document.querySelector("#code-msg");
+const code_champ = code_eleve.closest(".champ");
+code_eleve.addEventListener("input", function(){
+    const code = code_eleve.value.trim();
+
+    if(code === ""){
+        code_champ.className = "champ";
+        code_msg.textContent = "8 caractères min., 1 majuscule, 1 chiffre, 1 caractère spécial.";
+
+    }else if(regexCode.test(code) === false){
+         code_champ.className = "champ erreur";
+         code_msg.textContent = "Code invalide";
+
+    }else{
+        code_champ.className = "champ valide";
+        code_msg.textContent = "code valide";
+    }
+})
 
 

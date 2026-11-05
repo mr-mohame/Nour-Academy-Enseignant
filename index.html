@@ -109,7 +109,7 @@
 
 
                         <!-- Exemple : état VALIDE -->
-                        <div class="champ valide">
+                        <div class="champ">
                             <label for="prenom" class="text-sm font-medium">Prénom</label>
                             <input id="prenom" name="prenom" type="text" autocomplete="off"
                                 aria-describedby="prenom-msg"
@@ -118,7 +118,7 @@
                         </div>
 
                         <!-- Exemple : état ERREUR -->
-                        <div class="champ erreur">
+                        <div class="champ">
                             <label for="nom" class="text-sm font-medium">Nom</label>
                             <input id="nom" name="nom" type="text" autocomplete="off" aria-describedby="nom-msg"
                                 class="mt-1 h-11 w-full rounded-xl border border-line bg-paper px-3 outline-none focus:border-brand">
@@ -145,7 +145,7 @@
                         <div class="champ">
                             <label for="telephone" class="text-sm font-medium">Téléphone du parent</label>
                             <input id="telephone" name="telephone" type="tel" autocomplete="off"
-                                aria-describedby="telephone-msg"
+                                aria-describedby="telephone-msg" maxlength="10"
                                 class="mt-1 h-11 w-full rounded-xl border border-line bg-paper px-3 outline-none focus:border-brand">
                             <p id="telephone-msg" class="message mt-1 text-xs text-muted">06 / 07 ou +212 6 / 7, puis 8
                                 chiffres.</p>
@@ -154,7 +154,7 @@
                         <div class="champ">
                             <label for="code" class="text-sm font-medium">Code d'accès provisoire</label>
                             <input id="code" name="code" type="password" autocomplete="new-password"
-                                aria-describedby="code-msg"
+                                aria-describedby="code-msg" maxlength="8"
                                 class="mt-1 h-11 w-full rounded-xl border border-line bg-paper px-3 outline-none focus:border-brand">
                             <!-- Jauge de robustesse (B2) -->
                             <meter id="code-force" min="0" max="3" low="1.5" high="2.5" optimum="3" value="0"

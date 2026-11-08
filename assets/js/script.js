@@ -154,19 +154,24 @@ rechercheNom.addEventListener("input", filterGoupInput)
 // function pour filter le nom input et group option 
 function filterGoupInput() {
     const groupeSelectionne = filtre_groupe.value;
-    const valeurRechetcher = rechercheNom.value.trim();
+    const valeurRechetcher = rechercheNom.value.trim().toLowerCase();
+    // Tous les eleves du groupe
+    const elevesDuGroupe = eleves.filter(function (eleve) {
+        return groupeSelectionne === "" ||
+            eleve.groupeId === Number(groupeSelectionne);
+    });
+    // Recherche par prenom ou nom
+    const filter_data = elevesDuGroupe.filter(function (eleve) {
+        return eleve.prenom.toLowerCase().includes(valeurRechetcher) ||
+            eleve.nom.toLowerCase().includes(valeurRechetcher);
+    });
 
-    const filter_data = eleves.filter(function (eleve) {
-        return (eleve.groupeId == Number(groupeSelectionne) || groupeSelectionne == "") &&
-            (eleve.prenom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()) ||
-                eleve.nom.toLocaleLowerCase().includes(valeurRechetcher.toLocaleLowerCase()))
-    })
     renderData(filter_data);
+    afficherBilan(elevesDuGroupe);
+    afficherBilan(eleves);
 }
 
 // gerer les absences 
-
-
 liste_eleves.addEventListener("click", function (event) {
     const button = event.target.closest(".btn-absent");
     if (button === null) return;
@@ -198,6 +203,8 @@ liste_eleves.addEventListener("click", function (event) {
             absence_count.append(badge);
         }
     }
+    // Actualiser le bilan
+    filterGoupInput();
 });
 // gerer les notes 
 
@@ -231,6 +238,7 @@ liste_eleves.addEventListener("click", function (event) {
 
     // pour ajouter la note
     resultat_note.notes.push(note);
+    filterGoupInput();
 
     // pour calcule la moyenne on a appel la function calculmoyeen
     const moyenne = calculMoyenne(resultat_note.notes);
@@ -511,8 +519,78 @@ forma_eleve.addEventListener("submit", function (event) {
     document.querySelector("#code-force").value = 0;
     form_succes.textContent = "eleve ajouter avec succes";
     form_succes.hidden = false;
-
-
-
-
 });
+
+// bilan du groupe
+const bilanMoyenne = document.querySelector("#bilan-moyenne");
+const bilanAbsences = document.querySelector("#bilan-absences");
+const bilanAlertes = document.querySelector("#bilan-alertes");
+const bilanMeilleur = document.querySelector("#bilan-meilleur");
+const listeParents = document.querySelector("#liste-parents");
+const aucuneAlerte = document.querySelector("#aucune-alerte");
+
+
+function calculMoyenneGroupe(elevesDuGroupe) {
+    let somme = 0;
+    // boucle sur tous les eleves et leurs notes
+    for (let i = 0; i < elevesDuGroupe.length; i++) {
+        for (let j = 0; j < elevesDuGroupe[i].notes.length; j++) {
+            somme += elevesDuGroupe[i].notes[j];
+        }
+    }
+    // calcule le nombre total des notes
+    const nombreNotes = elevesDuGroupe.reduce(function (total, eleve) {
+        return total + eleve.notes.length;
+    }, 0);
+    // verifie cest existe des notes
+    if (nombreNotes === 0) return "—";
+
+    return (somme / nombreNotes).toFixed(2).replace(".", ",");
+}
+// Calculer le total des absences
+function calculTotalAbsences(elevesDuGroupe) {
+    return elevesDuGroupe.reduce(function (total, eleve) {
+        return total + eleve.absences;
+    }, 0);
+}
+// Compter les eleves en alerte
+function calculNombreAlertes(elevesDuGroupe) {
+    const alertes = elevesDuGroupe.filter(function (eleve) {
+        return eleve.absences >= 3;
+    });
+
+    return alertes.length;
+}
+
+// trouver le meilleur eleve
+function calculMeilleurEleve(elevesDuGroupe) {
+    let meilleur = null;
+    for (let i = 0; i < elevesDuGroupe.length; i++) {
+        const eleve = elevesDuGroupe[i];
+
+        if (eleve.notes.length === 0) continue;
+
+        const moyenne = eleve.notes.reduce(function (total, note) {
+            return total + note;
+        }, 0) / eleve.notes.length;
+
+        if (meilleur === null || moyenne > meilleur.moyenne) {
+            meilleur = {
+                nom: eleve.prenom + " " + eleve.nom,
+                moyenne: moyenne
+            };
+        }
+    }
+    if (meilleur === null) return "—";
+    return meilleur.nom + " — " +
+        meilleur.moyenne.toFixed(2).replace(".", ",") + " / 20";
+}
+
+///. function qui affiche la moyenne de groupe
+function afficherBilan(elevesDuGroupe) {
+    bilanMoyenne.textContent = calculMoyenneGroupe(elevesDuGroupe);
+    bilanAbsences.textContent = calculTotalAbsences(elevesDuGroupe);
+    bilanAlertes.textContent = calculNombreAlertes(elevesDuGroupe);
+    bilanMeilleur.textContent = calculMeilleurEleve(elevesDuGroupe);
+}
+afficherBilan(eleves);

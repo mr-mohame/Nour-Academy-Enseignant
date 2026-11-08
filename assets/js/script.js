@@ -621,3 +621,6 @@ function afficherBilan(elevesDuGroupe) {
     aucuneAlerte.hidden = !verifierAlertes(elevesDuGroupe);
 }
 afficherBilan(eleves);
+
+
+

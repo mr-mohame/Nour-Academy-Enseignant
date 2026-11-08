@@ -168,7 +168,7 @@ function filterGoupInput() {
 
     renderData(filter_data);
     afficherBilan(elevesDuGroupe);
-    afficherBilan(eleves);
+    
 }
 
 // gerer les absences 
@@ -238,7 +238,7 @@ liste_eleves.addEventListener("click", function (event) {
 
     // pour ajouter la note
     resultat_note.notes.push(note);
-    filterGoupInput();
+    
 
     // pour calcule la moyenne on a appel la function calculmoyeen
     const moyenne = calculMoyenne(resultat_note.notes);
@@ -249,6 +249,7 @@ liste_eleves.addEventListener("click", function (event) {
 
     // 
     input_note.value = "";
+    filterGoupInput();
 });
 
 
@@ -585,12 +586,41 @@ function calculMeilleurEleve(elevesDuGroupe) {
     return meilleur.nom + " — " +
         meilleur.moyenne.toFixed(2).replace(".", ",") + " / 20";
 }
+// afficher les parents a appeler
+function afficherParents(elevesDuGroupe) {
+    // garder les eleves alerte
+    const elevesAlertes = elevesDuGroupe.filter(function (eleve) {
+        return eleve.absences >= 3;
+    });
+    // vider la liste
+    listeParents.replaceChildren();
+    // afficher les parents
+    const parents = elevesAlertes.map(function (eleve) {
+        return eleve.prenom + " " + eleve.nom + " — " + eleve.telephoneParent;
+    });
+    for (let i = 0; i < parents.length; i++) {
+        const li = document.createElement("li");
+        li.textContent = parents[i];
+        listeParents.append(li);
+    }
+}
+// verifie si aucun eleve sur alerte
+function verifierAlertes(elevesDuGroupe) {
+    return elevesDuGroupe.every(function (eleve) {
+        return eleve.absences < 3;
+    });
+}
 
-///. function qui affiche la moyenne de groupe
+///. function  affiche la moyenne de groupe
 function afficherBilan(elevesDuGroupe) {
     bilanMoyenne.textContent = calculMoyenneGroupe(elevesDuGroupe);
     bilanAbsences.textContent = calculTotalAbsences(elevesDuGroupe);
     bilanAlertes.textContent = calculNombreAlertes(elevesDuGroupe);
     bilanMeilleur.textContent = calculMeilleurEleve(elevesDuGroupe);
+    afficherParents(elevesDuGroupe);
+    aucuneAlerte.hidden = !verifierAlertes(elevesDuGroupe);
 }
 afficherBilan(eleves);
+
+
+

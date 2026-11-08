@@ -5,10 +5,6 @@ const liste_eleves = document.querySelector("#liste-eleves");
 function creerLigne(eleve) {
     const li = document.createElement("li");
     li.classList.add("rounded-2xl", "border", "border-line", "bg-card", "p-3")
-    if (eleve.absences >= 3) {
-        li.classList.add("alerte");
-    }
-
     li.dataset.id = eleve.id
 
     const div = document.createElement("div");
@@ -119,11 +115,11 @@ const compteur = document.querySelector("#compteur");
 function renderData(filterData = eleves) {
     liste_eleves.replaceChildren();  // vider tout le contenu
     compteur.textContent = filterData.length + " eleve"
-    filterData.map(function (eleve) {
-        const ligne = creerLigne(eleve)
+    for (let i = 0; i < filterData.length; i++) {
+        const eleve = filterData[i];
+        const ligne = creerLigne(eleve);
         liste_eleves.append(ligne);
-    })
-
+    }
 }
 
 function calculMoyenne(notes) {
@@ -262,17 +258,20 @@ const regexName = /^[a-zA-ZÀ-ÿ\s-]{2,}$/;
 //regex email
 const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 //regex tele
-const regexTelephone = /^(06|07)[0-9]{8}$/;
+const regexTelephone = /^((06|07)[0-9]{8}|(\+212|00212)[67][0-9]{8})$/;
 //regex code privisoir
 const regexCode = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/;
 
-
-
+//forma prenom et nom 
+function formatNom(nom) {
+    return nom.charAt(0).toUpperCase() + nom.slice(1).toLowerCase();
+}
 // validation pour prenom
+const prenom_msg = document.querySelector("#prenom-msg");
 const prenom_champ = prenom_eleve.closest(".champ");
 prenom_eleve.addEventListener("input", function () {
 
-     const prenom = prenom_eleve.value.trim();
+    const prenom = prenom_eleve.value.trim();
 
     if (prenom === "") {
         prenom_champ.className = "champ";
@@ -280,20 +279,21 @@ prenom_eleve.addEventListener("input", function () {
     }
     else if (!regexName.test(prenom)) {
         prenom_champ.className = "champ erreur";
-        prenom_msg.textContent = "Prénom invalide.";
+        prenom_msg.textContent = "Prénom invalide";
     }
     else {
         prenom_champ.className = "champ valide";
-        prenom_msg.textContent = "Prénom valide.";
+        prenom_msg.textContent = "Prénom valide";
     }
 
 
 });
 // validation nom
+const nom_msg = document.querySelector("#nom-msg");
 const nom_champ = nom_eleve.closest(".champ");
 nom_eleve.addEventListener("input", function () {
 
-     const nom = nom_eleve.value.trim();
+    const nom = nom_eleve.value.trim();
 
     if (nom === "") {
         nom_champ.className = "champ";
@@ -301,11 +301,11 @@ nom_eleve.addEventListener("input", function () {
     }
     else if (!regexName.test(nom)) {
         nom_champ.className = "champ erreur";
-        nom_msg.textContent = "nom invalide.";
+        nom_msg.textContent = "nom invalide";
     }
     else {
         nom_champ.className = "champ valide";
-        nom_msg.textContent = "nom valide.";
+        nom_msg.textContent = "nom valide";
     }
 });
 
@@ -364,11 +364,11 @@ telephone_eleve.addEventListener("input", function () {
 
     if (tele === "") {
         tele_champ.className = "champ";
-        tele_msg.textContent = "10 chiffres : commence par 06 ou 07";
+        tele_msg.textContent = "exemple -> 0612345678 ou +212612345678";
     }
-    else if (regexTelephone.test(tele)=== false) {
+    else if (regexTelephone.test(tele) === false) {
         tele_champ.className = "champ erreur";
-        tele_msg.textContent = "Numero invalide : exemple 0612345678";
+        tele_msg.textContent = "Numero invalide : exemple 0612345678 ou +212612345678";
     }
     else {
         tele_champ.className = "champ valide";
@@ -380,21 +380,139 @@ telephone_eleve.addEventListener("input", function () {
 // pour valive le code provisoir 
 const code_msg = document.querySelector("#code-msg");
 const code_champ = code_eleve.closest(".champ");
-code_eleve.addEventListener("input", function(){
+code_eleve.addEventListener("input", function () {
     const code = code_eleve.value.trim();
 
-    if(code === ""){
+    if (code === "") {
         code_champ.className = "champ";
         code_msg.textContent = "8 caractères min., 1 majuscule, 1 chiffre, 1 caractère spécial.";
 
-    }else if(regexCode.test(code) === false){
-         code_champ.className = "champ erreur";
-         code_msg.textContent = "Code invalide";
+    } else if (regexCode.test(code) === false) {
+        code_champ.className = "champ erreur";
+        code_msg.textContent = "Code invalide";
 
-    }else{
+    } else {
         code_champ.className = "champ valide";
         code_msg.textContent = "code valide";
     }
 })
 
 
+// pour ajouter un nouveau eleve
+const form_succes = document.querySelector("#form-succes");
+const form_erreur = document.querySelector("#form-erreur");
+
+forma_eleve.addEventListener("submit", function (event) {
+    event.preventDefault();
+    //pour cache le msg de succes et de erreur 
+    form_succes.hidden = true;
+    form_erreur.hidden = true;
+    // format du prenom et du nom
+    prenom_eleve.value = formatNom(prenom_eleve.value.trim());
+    nom_eleve.value = formatNom(nom_eleve.value.trim());
+    // pour verifie tous les champ 
+    // validationsChamp cest une un array qui stocke les donne valide et chqaue result return F or T
+    const validationsChamp = [
+        regexName.test(prenom_eleve.value.trim()),
+        regexName.test(nom_eleve.value.trim()),
+        groupe_eleve.value != "",
+        regexEmail.test(email_eleve.value.trim()),
+        regexTelephone.test(telephone_eleve.value.trim()),
+        regexCode.test(code_eleve.value.trim())
+    ]
+    // verfie tous les validation avec every: boucle sur tous les elements et vue cest return true
+    const formulaireValide = validationsChamp.every(function (valide) {
+        return valide;
+    });
+    if (!formulaireValide) {
+        const champs = [
+            prenom_eleve,
+            nom_eleve,
+            groupe_eleve,
+            email_eleve,
+            telephone_eleve,
+            code_eleve
+        ];
+
+        for (let i = 0; i < validationsChamp.length; i++) {
+            if (validationsChamp[i] === false) {
+                champs[i].focus();
+                break;
+            }
+        }
+
+        return;
+    }
+
+    // on a recuprer les valeur du formulaire
+    const prenom = prenom_eleve.value.trim();
+    const nom = nom_eleve.value.trim();
+    const groupeId = Number(groupe_eleve.value);
+    const email = email_eleve.value.trim();
+    const telephone = telephone_eleve.value.trim();
+
+    // verifie est evite les doublons
+    const nomberEleves = eleves.filter(function (eleve) {
+        return Number(eleve.groupeId) === groupeId;
+
+    });
+
+    // verifie la limite de eleves
+
+    if (nomberEleves.length >= 15) {
+        form_erreur.textContent = "Ce groupe est complet (15 eleves)"
+        form_erreur.hidden = false
+        groupe_eleve.focus();   // focuss(): est une fonction bien definie qui or cible sur un element 
+        return;
+    }
+
+    // verifie si eleve et deja
+    const eleveDeja = eleves.some(function (eleve) {
+        return Number(eleve.groupeId) === groupeId &&
+            eleve.prenom.toLowerCase() === prenom.toLowerCase() &&
+            eleve.nom.toLowerCase() === nom.toLowerCase();
+    });
+    if (eleveDeja) {
+        form_erreur.textContent = " eleve deja dans le group.";
+        form_erreur.hidden = false;
+        return;
+    }
+
+
+    const nouvelId = Math.max(...eleves.map(function (eleve) {
+        return eleve.id
+    }), 0) + 1
+    // cree et aajouter un nouveau eleve 
+    const nouvelEleve = {
+        id: nouvelId,
+        prenom: prenom,
+        nom: nom,
+        groupeId: groupeId,
+        emailParent: email,
+        telephoneParent: telephone,
+        absences: 0,
+        notes: []
+    };
+    eleves.push(nouvelEleve); // pour ajouter au tableau
+    filterGoupInput() // pour actualiser la liste
+    forma_eleve.reset() // pour reinitialiser le formulaire 
+    // pour reinitialiser le formulaire et  supprime les classes erreur/valid
+    document.querySelectorAll("#form-eleve .champ").forEach(function (champ) {
+        champ.className = "champ";
+    });
+
+    prenom_msg.textContent = "2 caracteres aminimum";
+    nom_msg.textContent = "2 caracteres aminimum: letter espaces ou tirets";
+    groupe_msg.textContent = "groupe de leleve";
+    email_msg.textContent = "exemple : parent@mail.ma";
+    tele_msg.textContent = "exemple : 0612345678 ou +212612345678";
+    code_msg.textContent = "8 caractères min., 1 majuscule, 1 chiffre, 1 caractère spécial";
+
+    document.querySelector("#code-force").value = 0;
+    form_succes.textContent = "eleve ajouter avec succes";
+    form_succes.hidden = false;
+
+
+
+
+});

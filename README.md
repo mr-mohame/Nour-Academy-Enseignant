@@ -1,4 +1,4 @@
-# Nour Academy – Espace Enseignant
+****# Nour Academy – Espace Enseignant
 
 Application web de gestion pédagogique destinée aux enseignants de Nour Academy. Elle permet de gérer les élèves, suivre les absences, enregistrer les notes et organiser les groupes.
 
@@ -225,7 +225,9 @@ git commit -m "feat: ajouter la validation du formulaire élève"
 
 Projet Front-End réalisé pour Nour Academy.
 
-GitHub : https://github.com/mr-mohame
+Démo en ligne
+
+Consulter l'application météo : [Nour Academy – Démo GitHub](https://mr-mohame.github.io/Nour-Academy-Enseignant/) : mr-mohame
 
 ---
 

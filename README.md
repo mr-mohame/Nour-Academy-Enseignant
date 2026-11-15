@@ -227,7 +227,8 @@ Projet Front-End réalisé pour Nour Academy.
 
 Démo en ligne
 
-Consulter l'application météo : [Nour Academy – Démo GitHub](https://mr-mohame.github.io/Nour-Academy-Enseignant/) : mr-mohame
+Consulter le site Nour Academy – Espace Enseignant : [Nour Academy – Démo GitHub](https://mr-mohame.github.io/Nour-Academy-Enseignant/) :
+GitHub : mr-mohame
 
 ---
 
